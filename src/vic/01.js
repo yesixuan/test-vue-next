@@ -63,10 +63,10 @@ function render(vnode, container) {
 function patch(n1, n2, container,) {
   // debugger
   const { type, ref, shapeFlag } = n2
-  // if (typeof n2.type === "symbol") {
-  //   processText(n1, n2, container)
-  //   // return
-  // }
+  if (typeof n2.type === "symbol") {
+    processText(n1, n2, container)
+    return
+  }
   if (shapeFlag === 17 || shapeFlag === 9) {
     processElement(
       n1,
@@ -126,7 +126,7 @@ function createComponentInstance(vnode, parent, suspense) {
     setupContext: null,
 
     // per-instance asset storage (mutable during options resolution)
-    components: Object.create(appContext.components)
+    components: Object.create(appContext.components || [])
   }
   instance.ctx = { _: instance }
   instance.root = parent ? parent.root : instance
@@ -158,7 +158,8 @@ function setupRenderEffect(
     const { bm, m, a, parent } = instance
     // Vic 在这里创建组件根 dom 的 vNode 树 （这棵树里面的 children 也创建出 vnode）
     const subTree =  (instance.subTree = renderComponentRoot(instance))
-    container.innerHTML = ''
+    el && container.removeChild(el)
+    // container.innerHTML = ''
     // Vic 这个方法里面真正开始构建内存中的 dom 树
     patch(
       null,
